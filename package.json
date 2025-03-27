@@ -1,0 +1,38 @@
+{
+  "name": "name2email",
+  "displayName": "name2email",
+  "version": "0.0.1",
+  "author": "shb",
+  "description": "",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "chrome-extension",
+    "vue",
+    "vite",
+    "create-chrome-ext"
+  ],
+  "engines": {
+    "node": ">=14.18.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "fmt": "prettier --write '**/*.{vue,js,json,css,scss,md}'",
+    "zip": "npm run build && node src/zip.js"
+  },
+  "dependencies": {
+    "chrome-types": "^0.1.345",
+    "jsstore": "^4.9.0",
+    "vue": "^3.2.37"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.26",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "gulp": "^5.0.0",
+    "gulp-zip": "^6.0.0",
+    "prettier": "^3.0.3",
+    "vite": "^6.2.3"
+  }
+}
