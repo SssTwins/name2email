@@ -22,9 +22,9 @@ async function query(name) {
       where: {
         name: {
           like: name + '%',
-          limit: 10,
         },
       },
+      limit: 10,
     })
   })
 }
