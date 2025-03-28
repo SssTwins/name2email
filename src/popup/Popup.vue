@@ -1,12 +1,12 @@
 <script setup lang="js">
 import { ref } from 'vue'
 import conn, { tableData } from '../db/conn.js'
+import { read, utils } from 'xlsx';
 
 const name = ref('')
 const email = ref('')
 
 const handleSubmit = () => {
-  console.log('提交数据:', { name: name.value, email: email.value })
   save({ name: name.value, email: email.value })
 }
 
@@ -42,50 +42,74 @@ const handleSearch = async () => {
           like: searchName.value + '%',
         },
       },
+      limit: 10,
     })
   })
+}
+
+const uploadRef = ref()
+
+const submitExport = () => {
+  let workbooks = read(uploadRef.value)
+  console.log(workbooks.SheetNames)
 }
 </script>
 
 <template>
-  <main>
-    <h3>Popup Page</h3>
-
-    <div class="add">
-      <form @submit.prevent="handleSubmit">
-        <input v-model="name" placeholder="姓名" />
-        <input v-model="email" placeholder="邮箱" />
-        <button type="submit">新增</button>
-      </form>
-    </div>
-    <div class="search-container">
-      <!-- 搜索输入框和按钮 -->
-      <div class="search-box">
-        <input
-          v-model="searchName"
-          type="text"
-          placeholder="输入名称搜索..."
-          class="search-input"
-          @keyup.enter="handleSearch"
-        />
-        <button class="search-button" @click="handleSearch">搜索</button>
-      </div>
-
-      <!-- 加载状态 -->
-      <div v-if="isLoading" class="loading">搜索中...</div>
-
-      <!-- 搜索结果展示 -->
-      <div v-else-if="data.length > 0">
-        <div v-for="item in data" :key="item.id">
-          <div class="name">{{ item.name }}</div>
-          <div class="email">{{ item.email }}</div>
-        </div>
-      </div>
-
-      <!-- 无结果提示 -->
-      <div v-else-if="!isLoading" class="no-results">没有找到匹配的结果</div>
-    </div>
-  </main>
+  <el-container>
+    <el-main>
+      <el-row :gutter="20">
+        <el-col :span="11">
+          <el-form label-width="auto" style="max-width: 600px" size="small">
+            <el-form-item label="姓名">
+              <el-input v-model="name" />
+            </el-form-item>
+            <el-form-item label="邮箱">
+              <el-input v-model="email" />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="handleSubmit">新增</el-button>
+            </el-form-item>
+          </el-form>
+        </el-col>
+        <el-col :span="2">
+          <el-divider direction="vertical" style="height: 12em" />
+        </el-col>
+        <el-col :span="11">
+          <el-row>
+            <el-form label-width="auto" style="max-width: 600px" size="small">
+              <el-form-item label="姓名">
+                <el-input v-model="searchName" placeholder="输入名称搜索" />
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="handleSearch">搜索</el-button>
+              </el-form-item>
+              <!-- 加载状态 -->
+              <div v-if="isLoading" class="loading">搜索中...</div>
+              <!-- 搜索结果展示 -->
+              <div v-else-if="data.length > 0">
+                <div v-for="item in data" :key="item.id">
+                  <div class="name">{{ item.name }}</div>
+                  <div class="email">{{ item.email }}</div>
+                </div>
+              </div>
+              <!-- 无结果提示 -->
+              <div v-else-if="!isLoading" class="no-results">没有找到匹配的结果</div>
+            </el-form>
+          </el-row>
+          <el-divider />
+          <el-row>
+            <el-upload ref="uploadRef" class="upload-demo" :auto-upload="false">
+              <template #trigger>
+                <el-button type="primary">select file</el-button>
+              </template>
+              <el-button type="primary" @click="submitExport">导入</el-button>
+            </el-upload>
+          </el-row>
+        </el-col>
+      </el-row>
+    </el-main>
+  </el-container>
 </template>
 
 <style></style>
