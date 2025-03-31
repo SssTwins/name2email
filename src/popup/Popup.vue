@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 import conn, { tableData } from '../db/conn.js'
 import { read, utils } from 'xlsx'
-import { ElNotification, genFileId } from 'element-plus'
+import { ElMessage, genFileId } from 'element-plus'
+import { isNonEmptyString } from '../common/utils.js'
 
 const name = ref('')
 const email = ref('')
@@ -71,21 +72,27 @@ const submitExport = () => {
       console.log('rawData: ', rawData)
       const needInsert = []
       rawData.forEach((row) => {
-        needInsert.push({
-          name: row.name,
-          email: row.email,
-        })
+        if (isNonEmptyString(row.name) && isNonEmptyString(row.email)) {
+          needInsert.push({
+            name: row.name,
+            email: row.email,
+          })
+        }
       })
       console.log('needInsert: ', needInsert)
-      let noOfRowsInserted = conn.then((conn) => {
-        conn.insert({
-          into: tableData,
-          values: needInsert,
+      conn
+        .then((conn) => {
+          return conn.insert({
+            into: tableData,
+            values: needInsert,
+          })
         })
-      })
-      if (noOfRowsInserted > 0) {
-        console.log('Successfully Added')
-      }
+        .then((noOfRowsInserted) => {
+          if (noOfRowsInserted > 0) {
+            console.log('Successfully Added')
+            ElMessage.success('导入成功')
+          }
+        })
     }
   }
   fileData.value = null // 清除文件数据
@@ -162,7 +169,7 @@ const handleRemove = () => {
               <template #trigger>
                 <el-button type="primary" size="small">选择文件</el-button>
               </template>
-              <el-button type="primary" @click="submitExport" size="small"> 导入</el-button>
+              <el-button type="primary" @click="submitExport" size="small">导入</el-button>
             </el-upload>
           </el-row>
         </el-col>
