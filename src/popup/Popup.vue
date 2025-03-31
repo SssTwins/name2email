@@ -1,7 +1,8 @@
 <script setup lang="js">
 import { ref } from 'vue'
 import conn, { tableData } from '../db/conn.js'
-import { read, utils } from 'xlsx';
+import { read, utils } from 'xlsx'
+import { ElNotification, genFileId } from 'element-plus'
 
 const name = ref('')
 const email = ref('')
@@ -48,10 +49,58 @@ const handleSearch = async () => {
 }
 
 const uploadRef = ref()
+const fileData = ref()
+
+const handleBeforeUpload = (file) => {
+  // 在这里获取文件的二进制数据
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    fileData.value = e.target.result // 文件的二进制数据
+  }
+  reader.readAsArrayBuffer(file) // 或者使用 readAsDataURL(file) 读取为 Data URL
+  return true // 阻止文件自动上传
+}
 
 const submitExport = () => {
-  let workbooks = read(uploadRef.value)
-  console.log(workbooks.SheetNames)
+  const workbooks = read(fileData.value)
+  const sheetNames = workbooks.SheetNames
+  if (sheetNames && sheetNames.length > 0) {
+    const worksheet = workbooks.Sheets[workbooks.SheetNames[0]]
+    const rawData = utils.sheet_to_json(worksheet)
+    if (rawData && rawData.length > 0) {
+      console.log('rawData: ', rawData)
+      const needInsert = []
+      rawData.forEach((row) => {
+        needInsert.push({
+          name: row.name,
+          email: row.email,
+        })
+      })
+      console.log('needInsert: ', needInsert)
+      let noOfRowsInserted = conn.then((conn) => {
+        conn.insert({
+          into: tableData,
+          values: needInsert,
+        })
+      })
+      if (noOfRowsInserted > 0) {
+        console.log('Successfully Added')
+      }
+    }
+  }
+  fileData.value = null // 清除文件数据
+  uploadRef.value.clearFiles()
+}
+
+const handleExceed = (files) => {
+  uploadRef.value.clearFiles()
+  const file = files[0]
+  file.uid = genFileId()
+  uploadRef.value.handleStart(file)
+}
+
+const handleRemove = () => {
+  fileData.value = null // 清除文件数据
 }
 </script>
 
@@ -99,11 +148,21 @@ const submitExport = () => {
           </el-row>
           <el-divider />
           <el-row>
-            <el-upload ref="uploadRef" class="upload-demo" :auto-upload="false">
+            <el-upload
+              ref="uploadRef"
+              class="upload"
+              action=""
+              :before-upload="handleBeforeUpload"
+              :on-remove="handleRemove"
+              :limit="1"
+              :on-exceed="handleExceed"
+              :show-file-list="true"
+              :multiple="false"
+            >
               <template #trigger>
-                <el-button type="primary">select file</el-button>
+                <el-button type="primary" size="small">选择文件</el-button>
               </template>
-              <el-button type="primary" @click="submitExport">导入</el-button>
+              <el-button type="primary" @click="submitExport" size="small"> 导入</el-button>
             </el-upload>
           </el-row>
         </el-col>

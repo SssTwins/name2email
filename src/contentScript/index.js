@@ -15,7 +15,6 @@ document.addEventListener('input', async function (event) {
         },
         {},
         (response) => {
-          console.log(response)
           showSuggestions(target, response)
         },
       )
