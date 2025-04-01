@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import conn, { tableData } from '../db/conn.js'
 import { isNonEmptyString } from '../common/utils.js'
+import { ElMessageBox } from 'element-plus'
 
 const panelTableData = ref([])
 const total = ref(0)
@@ -61,6 +62,30 @@ const handleFilter = () => {
   currentPage.value = 1
   fetchData()
 }
+
+const handleEdit = (index, row) => {
+  console.log(index, row)
+}
+const handleDelete = (index, row) => {
+  ElMessageBox.confirm('确定要删除该记录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(() => {
+    conn
+      .then((conn) => {
+        conn.remove({
+          from: tableData,
+          where: {
+            id: row.id,
+          },
+        })
+      })
+      .then(() => {
+        fetchData()
+      })
+  })
+}
 </script>
 
 <template>
@@ -90,11 +115,18 @@ const handleFilter = () => {
 
     <!-- 表格 -->
     <el-table :data="panelTableData" v-loading="loading" border stripe style="width: 100%">
-      <el-table-column prop="id" label="ID" width="100"></el-table-column>
+      <el-table-column prop="id" label="ID" width="50"></el-table-column>
       <el-table-column prop="name" label="姓名"></el-table-column>
       <el-table-column prop="email" label="邮箱"></el-table-column>
-      <!-- 添加无数据提示 -->
-      <el-empty v-if="!loading && tableData.length === 0" description="暂无数据"></el-empty>
+<!--      &lt;!&ndash; 操作列 &ndash;&gt;
+      <el-table-column label="操作" width="140">
+        <template #default="scope">
+          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+            删除
+          </el-button>
+        </template>
+      </el-table-column>-->
     </el-table>
 
     <!-- 分页 -->
