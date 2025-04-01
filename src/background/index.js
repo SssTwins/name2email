@@ -21,7 +21,7 @@ async function query(name) {
       from: tableData,
       where: {
         name: {
-          like: name + '%',
+          like: '%' + name + '%',
         },
       },
       limit: 10,
