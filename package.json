@@ -27,6 +27,7 @@
     "element-plus": "^2.9.7",
     "jsstore": "^4.9.0",
     "vue": "^3.2.37",
+    "vue-router": "^4.5.0",
     "xlsx": "file:vendor/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
