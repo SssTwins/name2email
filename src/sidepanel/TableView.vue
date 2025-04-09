@@ -145,4 +145,8 @@ const handleDelete = (index, row) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.form-inline {
+  padding-top: 10px;
+}
+</style>

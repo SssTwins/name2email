@@ -40,11 +40,44 @@ function showSuggestions(inputElement, suggestions) {
     maxHeight: '180px', // 稍微增加高度
     overflowY: 'auto',
     boxShadow: '0 6px 12px rgba(0, 0, 0, 0.12)', // 更柔和的阴影
-    borderRadius: '6px', // 稍微增加圆角
+    borderRadius: '8px', //圆角
+    overflow: 'hidden', // 修改为 hidden 保留外层圆角
     paddingTop: '32px', // 增加顶部内边距
     width: '300px', // 固定宽度
     fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', // 系统字体
   })
+
+  // 添加滚动容器
+  const scrollWrapper = document.createElement('div')
+  Object.assign(scrollWrapper.style, {
+    maxHeight: '180px',
+    overflowY: 'auto',
+    paddingRight: '8px', // 为滚动条预留空间
+    borderRadius: '8px', // 保持圆角
+  })
+
+  popup.appendChild(scrollWrapper)
+
+  // 自定义滚动条样式（需在CSS中实现）
+  const style = document.createElement('style')
+  style.textContent = `
+  #suggestions-popup::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background-color: transparent;
+  }
+
+  #suggestions-popup::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0,0,0,0.2);
+    border: 2px solid #ffffff; // 通过边框保持圆角效果
+  }
+
+  #suggestions-popup::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+`
+  document.head.appendChild(style)
 
   // 创建关闭按钮
   const closeButton = document.createElement('button')
@@ -94,7 +127,7 @@ function showSuggestions(inputElement, suggestions) {
         inputElement.value = suggestion.email
         hideSuggestions()
       })
-      popup.appendChild(item)
+      scrollWrapper.appendChild(item)
     })
   } else {
     const item = document.createElement('div')
@@ -105,7 +138,7 @@ function showSuggestions(inputElement, suggestions) {
       pointerEvents: 'none', // 禁用交互
     })
     item.textContent = '未找到匹配的牌手'
-    popup.appendChild(item)
+    scrollWrapper.appendChild(item)
   }
 
   // 将弹出框添加到页面中
