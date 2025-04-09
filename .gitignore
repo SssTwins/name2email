@@ -24,3 +24,5 @@ secrets.*.js
 
 .vscode
 .idea
+/name2email/
+/name2email.zip
