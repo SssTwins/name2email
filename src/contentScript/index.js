@@ -32,55 +32,79 @@ function showSuggestions(inputElement, suggestions) {
   // 创建弹出框
   const popup = document.createElement('div')
   popup.id = 'suggestions-popup'
-  popup.style.position = 'absolute'
-  popup.style.border = '1px solid #ccc'
-  popup.style.background = '#fff'
-  popup.style.zIndex = '9999' // 设置一个非常大的 z-index 值
-  popup.style.maxHeight = '150px'
-  popup.style.overflowY = 'auto'
-  popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)' // 添加阴影
-  popup.style.borderRadius = '4px' // 圆角
-  popup.style.paddingTop = '24px' // 为关闭按钮预留空间
+  Object.assign(popup.style, {
+    position: 'absolute',
+    border: '1px solid #e0e0e0',
+    background: '#ffffff',
+    zIndex: '9999',
+    maxHeight: '180px', // 稍微增加高度
+    overflowY: 'auto',
+    boxShadow: '0 6px 12px rgba(0, 0, 0, 0.12)', // 更柔和的阴影
+    borderRadius: '6px', // 稍微增加圆角
+    paddingTop: '32px', // 增加顶部内边距
+    width: '300px', // 固定宽度
+    fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', // 系统字体
+  })
 
   // 创建关闭按钮
   const closeButton = document.createElement('button')
   closeButton.textContent = '×'
-  closeButton.style.position = 'absolute'
-  closeButton.style.top = '5px'
-  closeButton.style.right = '5px'
-  closeButton.style.background = 'transparent'
-  closeButton.style.border = 'none'
-  closeButton.style.cursor = 'pointer'
-  closeButton.style.fontSize = '16px'
-  closeButton.style.color = '#999'
-  closeButton.style.padding = '0'
-  closeButton.style.margin = '0'
-  closeButton.style.lineHeight = '1'
-  closeButton.addEventListener('click', function () {
-    hideSuggestions()
+  Object.assign(closeButton.style, {
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '20px',
+    color: '#666',
+    padding: '4px',
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+    lineHeight: '1',
+    transition: 'all 0.2s',
   })
+  // 添加悬停效果
+  closeButton.addEventListener('mouseover', () => (closeButton.style.background = '#f5f5f5'))
+  closeButton.addEventListener('mouseout', () => (closeButton.style.background = 'transparent'))
+  closeButton.addEventListener('click', hideSuggestions)
   popup.appendChild(closeButton)
 
   // 添加候选项
   if (suggestions && suggestions.length > 0) {
     suggestions.forEach((suggestion) => {
       const item = document.createElement('div')
-      item.textContent = suggestion.name + ' - ' + suggestion.email
-      item.style.padding = '8px 12px'
-      item.style.cursor = 'pointer'
-      item.style.borderBottom = '1px solid #eee' // 分隔线
-      item.addEventListener('click', function () {
-        inputElement.value = suggestion.email // 将选中的内容填充到输入框
+      Object.assign(item.style, {
+        padding: '10px 16px',
+        cursor: 'pointer',
+        borderBottom: '1px solid #f5f5f5', // 更浅的分隔线
+        color: '#333', // 确保黑色文字
+        fontSize: '14px',
+        lineHeight: '1.5',
+        transition: 'background 0.2s',
+      })
+      item.textContent = `${suggestion.name} - ${suggestion.email}`
+
+      // 添加悬停效果
+      item.addEventListener('mouseover', () => (item.style.background = '#f8f9fa'))
+      item.addEventListener('mouseout', () => (item.style.background = '#fff'))
+
+      item.addEventListener('click', () => {
+        inputElement.value = suggestion.email
         hideSuggestions()
       })
       popup.appendChild(item)
     })
   } else {
     const item = document.createElement('div')
-    item.textContent = '未搜索到对应选手'
-    item.style.padding = '8px 12px'
-    item.style.cursor = 'pointer'
-    item.style.borderBottom = '1px solid #eee' // 分隔线
+    Object.assign(item.style, {
+      padding: '12px 16px',
+      color: '#666', // 灰色提示文字
+      fontSize: '14px',
+      pointerEvents: 'none', // 禁用交互
+    })
+    item.textContent = '未找到匹配的牌手'
     popup.appendChild(item)
   }
 
