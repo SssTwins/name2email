@@ -17,6 +17,11 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           chunkFileNames: 'assets/chunk-[hash].js',
+          manualChunks: {
+            'vue-vendor': ['vue', 'vue-router'],
+            'element-plus': ['element-plus'],
+            lodash: ['lodash-es'],
+          },
         },
       },
     },

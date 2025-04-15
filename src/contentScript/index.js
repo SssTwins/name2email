@@ -1,6 +1,7 @@
-console.info('contentScript is running')
+let isProgrammaticChange = false // 全局标记
 
 document.addEventListener('input', async function (event) {
+  if (isProgrammaticChange) return // 跳过程序触发的修改
   const target = event.target
   // 检查目标元素是否是输入框
   if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
@@ -23,6 +24,25 @@ document.addEventListener('input', async function (event) {
     }
   }
 })
+
+function smartInputValue(inputElement, suggestion) {
+  return () => {
+    isProgrammaticChange = true // 标记为程序修改
+    inputElement.value = suggestion.email
+    // 触发input事件
+    const inputEvent = new Event('input', { bubbles: true })
+    inputElement.dispatchEvent(inputEvent)
+
+    // 触发change事件
+    const changeEvent = new Event('change', { bubbles: true })
+    inputElement.dispatchEvent(changeEvent)
+    hideSuggestions()
+    // 恢复标记（注意异步恢复确保事件处理完成）
+    setTimeout(() => {
+      isProgrammaticChange = false
+    }, 100)
+  }
+}
 
 // 显示候选项
 function showSuggestions(inputElement, suggestions) {
@@ -123,10 +143,7 @@ function showSuggestions(inputElement, suggestions) {
       item.addEventListener('mouseover', () => (item.style.background = '#f8f9fa'))
       item.addEventListener('mouseout', () => (item.style.background = '#fff'))
 
-      item.addEventListener('click', () => {
-        inputElement.value = suggestion.email
-        hideSuggestions()
-      })
+      item.addEventListener('click', smartInputValue(inputElement, suggestion))
       scrollWrapper.appendChild(item)
     })
   } else {
