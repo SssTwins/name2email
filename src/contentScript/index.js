@@ -25,6 +25,49 @@ document.addEventListener('input', async function (event) {
   }
 })
 
+// 在全局添加键盘事件监听
+document.addEventListener('keydown', function (event) {
+  const popup = document.getElementById('suggestions-popup')
+  if (!popup) return
+
+  const items = popup.querySelectorAll('.suggestion-item')
+  if (items.length === 0) return
+
+  let currentIndex = parseInt(popup.getAttribute('data-current-index')) || 0
+  // 处理键盘事件
+  switch (event.key) {
+    case 'ArrowDown':
+      event.preventDefault()
+      currentIndex = (currentIndex + 1) % items.length
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      currentIndex = (currentIndex - 1 + items.length) % items.length
+      break
+    case 'Enter':
+      event.preventDefault()
+      if (currentIndex >= 0 && currentIndex < items.length) {
+        items[currentIndex].click()
+      }
+      return
+    default:
+      return
+  }
+
+  // 更新状态和样式
+  popup.setAttribute('data-current-index', currentIndex.toString())
+  popup.setAttribute('data-scrolling', 'true')
+  items.forEach((item, index) => {
+    let match = index === currentIndex
+    item.style.backgroundColor = match ? '#f8f9fa' : ''
+    if (match) {
+      // 设置滚动标记
+      item.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }
+  })
+  setTimeout(() => popup.removeAttribute('data-scrolling'), 100)
+})
+
 function smartInputValue(inputElement, suggestion) {
   return () => {
     isProgrammaticChange = true // 标记为程序修改
@@ -37,6 +80,7 @@ function smartInputValue(inputElement, suggestion) {
     const changeEvent = new Event('change', { bubbles: true })
     inputElement.dispatchEvent(changeEvent)
     hideSuggestions()
+    inputElement.focus()
     // 恢复标记（注意异步恢复确保事件处理完成）
     setTimeout(() => {
       isProgrammaticChange = false
@@ -126,8 +170,9 @@ function showSuggestions(inputElement, suggestions) {
 
   // 添加候选项
   if (suggestions && suggestions.length > 0) {
-    suggestions.forEach((suggestion) => {
+    suggestions.forEach((suggestion, index) => {
       const item = document.createElement('div')
+      item.className = 'suggestion-item' // 添加类名
       Object.assign(item.style, {
         padding: '10px 16px',
         cursor: 'pointer',
@@ -138,11 +183,35 @@ function showSuggestions(inputElement, suggestions) {
         transition: 'background 0.2s',
       })
       item.textContent = `${suggestion.name} - ${suggestion.email}`
-
+      // 初始化的时候默认选中第一个
+      if (index === 0) {
+        popup.setAttribute('data-current-index', '0')
+        item.style.backgroundColor = '#f8f9fa'
+        item.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      }
       // 添加悬停效果
-      item.addEventListener('mouseover', () => (item.style.background = '#f8f9fa'))
+      item.addEventListener('mouseover', () => {
+        const popup = document.getElementById('suggestions-popup')
+        // 如果是按键触发的滚动期间，忽略悬停事件
+        if (popup && popup.getAttribute('data-scrolling') === 'true') {
+          return
+        }
+        const items = popup.querySelectorAll('.suggestion-item')
+        if (items.length === 0) {
+          return
+        }
+        // 设置当前位置的index
+        popup.setAttribute('data-current-index', index)
+        // 设置当前位置背景，移除其他位置背景色
+        items.forEach((item, i) => {
+          let match = i === index
+          item.style.backgroundColor = match ? '#f8f9fa' : ''
+          if (match) {
+            item.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+          }
+        })
+      })
       item.addEventListener('mouseout', () => (item.style.background = '#fff'))
-
       item.addEventListener('click', smartInputValue(inputElement, suggestion))
       scrollWrapper.appendChild(item)
     })
