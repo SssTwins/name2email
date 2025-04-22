@@ -23,9 +23,11 @@
     "zip": "npm run build && node src/zip.js"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "chrome-types": "^0.1.345",
     "element-plus": "^2.9.7",
     "jsstore": "^4.9.0",
+    "unplugin-element-plus": "^0.9.1",
     "vue": "^3.2.37",
     "vue-router": "^4.5.0",
     "xlsx": "file:vendor/xlsx-0.20.3.tgz"
@@ -36,7 +38,9 @@
     "gulp": "^5.0.0",
     "gulp-zip": "^6.0.0",
     "prettier": "^3.0.3",
+    "rollup-plugin-visualizer": "^5.14.0",
     "unplugin-auto-import": "^19.1.2",
+    "unplugin-icons": "^22.1.0",
     "unplugin-vue-components": "^28.4.1",
     "vite": "^6.2.6"
   }

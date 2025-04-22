@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 import conn, { tableData } from '../db/conn.js'
 import { isNonEmptyString } from '../common/utils.js'
-import { ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 
 const panelTableData = ref([])
 const total = ref(0)
@@ -63,28 +64,62 @@ const handleFilter = () => {
   fetchData()
 }
 
-const handleEdit = (index, row) => {
-  console.log(index, row)
+const editableRow = ref(null)
+const originalData = ref(null)
+
+const startEdit = (row) => {
+  editableRow.value = { ...row }
+  originalData.value = { ...row }
 }
-const handleDelete = (index, row) => {
+
+const saveEdit = async () => {
+  try {
+    await conn.then((conn) =>
+      conn.update({
+        in: tableData,
+        set: editableRow.value,
+        where: { id: editableRow.value.id },
+      }),
+    )
+    await fetchData()
+    ElMessage.success('修改成功')
+    cancelEdit()
+  } catch (error) {
+    ElMessage.error('保存失败: ' + error.message)
+  }
+}
+
+const cancelEdit = () => {
+  editableRow.value = null
+  originalData.value = null
+}
+const handleDelete = (_, row) => {
   ElMessageBox.confirm('确定要删除该记录吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
-  }).then(() => {
-    conn
-      .then((conn) => {
-        conn.remove({
-          from: tableData,
-          where: {
-            id: row.id,
-          },
-        })
-      })
-      .then(() => {
-        fetchData()
-      })
   })
+    .then(() => {
+      conn
+        .then((conn) => {
+          conn.remove({
+            from: tableData,
+            where: {
+              id: row.id,
+            },
+          })
+        })
+        .then(() => {
+          fetchData()
+        })
+        .catch((error) => {
+          console.log(error)
+          ElMessage.error(error.message)
+        })
+    })
+    .catch((error) => {
+      console.log(error.message)
+    })
 }
 </script>
 
@@ -113,21 +148,46 @@ const handleDelete = (index, row) => {
         ></el-input>
       </el-form-item>
     </el-form>
-
+    <!--    <el-button type="primary" @click="showCreateDialog" class="mb-3">
+          <el-icon>
+            <Plus />
+          </el-icon>
+          新增
+        </el-button>-->
     <!-- 表格 -->
     <el-table :data="panelTableData" v-loading="loading" border stripe style="width: 100%">
       <el-table-column prop="id" label="ID" width="50"></el-table-column>
-      <el-table-column prop="name" label="姓名"></el-table-column>
-      <el-table-column prop="email" label="邮箱"></el-table-column>
-      <!--      &lt;!&ndash; 操作列 &ndash;&gt;
-            <el-table-column label="操作" width="140">
-              <template #default="scope">
-                <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>-->
+      <el-table-column prop="name" label="姓名">
+        <template #default="{ row }">
+          <div v-if="editableRow?.id === row.id">
+            <el-input v-model="editableRow.name" size="small" />
+          </div>
+          <span v-else>{{ row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="email" label="邮箱">
+        <template #default="{ row }">
+          <div v-if="editableRow?.id === row.id">
+            <el-input v-model="editableRow.email" size="small" />
+          </div>
+          <span v-else>{{ row.email }}</span>
+        </template>
+      </el-table-column>
+      <!-- 操作列 -->
+      <el-table-column label="操作" width="140">
+        <template #default="scope">
+          <template v-if="editableRow?.id === scope.row.id">
+            <el-button type="success" size="small" @click="saveEdit">保存</el-button>
+            <el-button size="small" @click="cancelEdit">取消</el-button>
+          </template>
+          <template v-else>
+            <el-button size="small" @click="startEdit(scope.row)">编辑</el-button>
+            <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
+              删除
+            </el-button>
+          </template>
+        </template>
+      </el-table-column>
     </el-table>
 
     <!-- 分页 -->

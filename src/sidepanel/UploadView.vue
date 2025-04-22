@@ -44,13 +44,12 @@ const submitExport = () => {
         })
         .then((noOfRowsInserted) => {
           if (noOfRowsInserted > 0) {
-            console.log('Successfully Added')
             ElMessage.success('导入成功')
           }
         })
         .catch((error) => {
           console.log(error)
-          ElMessage.success('导入失败：' + error.message)
+          ElMessage.error('导入失败：' + error.message)
         })
     }
   }
@@ -72,7 +71,7 @@ const handleRemove = () => {
 
 <template>
   <el-container>
-    <el-main class="container">
+    <el-main class="container" id="uploadMain">
       <el-row :gutter="20" class="main-row">
         <!-- 数据导入板块 -->
         <el-col :xs="24" :sm="24" :md="8" class="card-col">

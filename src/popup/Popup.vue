@@ -1,6 +1,7 @@
 <script setup lang="js">
 import { ref } from 'vue'
 import conn, { tableData } from '../db/conn.js'
+import { ElMessage } from 'element-plus'
 
 const name = ref('')
 const email = ref('')
@@ -23,7 +24,7 @@ const save = async (data) => {
   })
 
   if (noOfRowsInserted > 0) {
-    console.log('Successfully Added')
+    ElMessage.success('添加成功')
     name.value = ''
     email.value = ''
   }
