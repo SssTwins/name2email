@@ -25,7 +25,6 @@ const submitExport = () => {
     const worksheet = workbooks.Sheets[workbooks.SheetNames[0]]
     const rawData = utils.sheet_to_json(worksheet)
     if (rawData && rawData.length > 0) {
-      console.log('rawData: ', rawData)
       const needInsert = []
       rawData.forEach((row) => {
         if (isNonEmptyString(row.name) && isNonEmptyString(row.email)) {
@@ -48,6 +47,10 @@ const submitExport = () => {
             console.log('Successfully Added')
             ElMessage.success('导入成功')
           }
+        })
+        .catch((error) => {
+          console.log(error)
+          ElMessage.success('导入失败：' + error.message)
         })
     }
   }

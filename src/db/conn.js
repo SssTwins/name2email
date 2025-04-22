@@ -13,10 +13,20 @@ function getDBInitData() {
       name: { notNull: true, dataType: 'string' },
       email: { notNull: true, unique: true, dataType: 'string' },
     },
+    alter: {
+      2: {
+        drop: {
+          email: {
+            unique: false,
+          },
+        },
+      },
+    },
   }
   return {
     name: dbName2email,
     tables: [tblData],
+    version: 2,
   }
 }
 

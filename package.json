@@ -1,7 +1,7 @@
 {
   "name": "name2email",
   "displayName": "name2email",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "shb",
   "description": "",
   "type": "module",
@@ -38,6 +38,6 @@
     "prettier": "^3.0.3",
     "unplugin-auto-import": "^19.1.2",
     "unplugin-vue-components": "^28.4.1",
-    "vite": "^6.2.3"
+    "vite": "^6.2.6"
   }
 }
