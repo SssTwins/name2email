@@ -26,3 +26,4 @@ secrets.*.js
 .idea
 /name2email/
 /name2email.zip
+stats.html
