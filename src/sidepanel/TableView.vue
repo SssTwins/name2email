@@ -66,6 +66,7 @@ const handleFilter = () => {
 
 const editableRow = ref(null)
 const originalData = ref(null)
+const creating = ref(false)
 
 const startEdit = (row) => {
   editableRow.value = { ...row }
@@ -74,15 +75,29 @@ const startEdit = (row) => {
 
 const saveEdit = async () => {
   try {
-    await conn.then((conn) =>
-      conn.update({
-        in: tableData,
-        set: editableRow.value,
-        where: { id: editableRow.value.id },
-      }),
-    )
+    if (editableRow.value.id === -1) {
+      await conn.then((conn) =>
+        conn.insert({
+          into: tableData,
+          values: [
+            {
+              name: editableRow.value.name,
+              email: editableRow.value.email,
+            },
+          ],
+        }),
+      )
+    } else {
+      await conn.then((conn) =>
+        conn.update({
+          in: tableData,
+          set: editableRow.value,
+          where: { id: editableRow.value.id },
+        }),
+      )
+    }
     await fetchData()
-    ElMessage.success('修改成功')
+    ElMessage.success('保存成功')
     cancelEdit()
   } catch (error) {
     ElMessage.error('保存失败: ' + error.message)
@@ -92,7 +107,12 @@ const saveEdit = async () => {
 const cancelEdit = () => {
   editableRow.value = null
   originalData.value = null
+  if (creating.value) {
+    creating.value = false
+  }
+  fetchData()
 }
+
 const handleDelete = (_, row) => {
   ElMessageBox.confirm('确定要删除该记录吗？', '提示', {
     confirmButtonText: '确定',
@@ -121,6 +141,17 @@ const handleDelete = (_, row) => {
       console.log(error.message)
     })
 }
+
+const showCreateRow = () => {
+  if (creating.value === true) {
+    ElMessage.warning('正在创建中，请先保存当前数据')
+    return
+  }
+  creating.value = true
+  let newRow = { id: -1, name: null, email: null }
+  panelTableData.value = [newRow, ...panelTableData.value]
+  startEdit(newRow)
+}
 </script>
 
 <template>
@@ -148,13 +179,14 @@ const handleDelete = (_, row) => {
         ></el-input>
       </el-form-item>
     </el-form>
-    <!--    <el-button type="primary" @click="showCreateDialog" class="mb-3">
-          <el-icon>
-            <Plus />
-          </el-icon>
-          新增
-        </el-button>-->
-    <!-- 表格 -->
+    <el-row style="padding-bottom: 15px">
+      <el-button type="primary" @click="showCreateRow" class="mb-3" size="small">
+        <el-icon>
+          <Plus />
+        </el-icon>
+        新增
+      </el-button>
+    </el-row>
     <el-table :data="panelTableData" v-loading="loading" border stripe style="width: 100%">
       <el-table-column prop="id" label="ID" width="50"></el-table-column>
       <el-table-column prop="name" label="姓名">

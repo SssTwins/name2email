@@ -28,3 +28,7 @@ async function query(name) {
     })
   })
 }
+
+chrome.sidePanel
+  .setPanelBehavior({ openPanelOnActionClick: true })
+  .catch((error) => console.error(error))

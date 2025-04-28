@@ -68,6 +68,7 @@ document.addEventListener('keydown', function (event) {
   setTimeout(() => popup.removeAttribute('data-scrolling'), 100)
 })
 
+// 将本插件的输入值伪装成用户的输入行为，替换值并触发事件
 function smartInputValue(inputElement, suggestion) {
   return () => {
     isProgrammaticChange = true // 标记为程序修改
@@ -85,6 +86,59 @@ function smartInputValue(inputElement, suggestion) {
     setTimeout(() => {
       isProgrammaticChange = false
     }, 100)
+  }
+}
+
+// 调整弹出框位置以适应输入框的位置
+function adjustPopupPosition(popup, inputElement) {
+  // 获取弹出框的实际尺寸
+  const popupRect = popup.getBoundingClientRect()
+  let popupHeight = popupRect.height
+  const popupWidth = popupRect.width
+
+  const inputRect = inputElement.getBoundingClientRect()
+
+  // 调整垂直位置
+  let top
+  const spaceBelow = window.innerHeight - inputRect.bottom
+  if (spaceBelow >= popupHeight) {
+    // 下方空间足够，向下显示
+    top = inputRect.bottom + window.scrollY
+  } else {
+    // 尝试向上显示
+    top = inputRect.top + window.scrollY - popupHeight
+    // 检查顶部是否超出视口
+    if (top < window.scrollY) {
+      // 调整到视口顶部并限制高度
+      top = window.scrollY
+      const maxHeight = window.innerHeight - 10 // 留出边距
+      popup.style.maxHeight = `${maxHeight}px`
+      // 重新获取高度
+      popup.getBoundingClientRect().height
+    }
+  }
+
+  // 调整水平位置
+  let left = inputRect.left + window.scrollX
+  const rightEdge = left + popupWidth
+  const maxRight = window.scrollX + window.innerWidth - 20
+  if (rightEdge > maxRight) {
+    left = maxRight - popupWidth
+  }
+  // 确保左侧不超出视口
+  if (left < window.scrollX) {
+    left = window.scrollX
+  }
+
+  popup.style.top = `${top}px`
+  popup.style.left = `${left}px`
+}
+
+// 隐藏候选项
+function hideSuggestions() {
+  const popup = document.getElementById('suggestions-popup')
+  if (popup) {
+    popup.remove()
   }
 }
 
@@ -230,16 +284,5 @@ function showSuggestions(inputElement, suggestions) {
   // 将弹出框添加到页面中
   document.body.appendChild(popup)
 
-  // 定位弹出框
-  const rect = inputElement.getBoundingClientRect()
-  popup.style.top = `${rect.bottom + window.scrollY}px`
-  popup.style.left = `${rect.left + window.scrollX}px`
-}
-
-// 隐藏候选项
-function hideSuggestions() {
-  const popup = document.getElementById('suggestions-popup')
-  if (popup) {
-    popup.remove()
-  }
+  adjustPopupPosition(popup, inputElement)
 }
