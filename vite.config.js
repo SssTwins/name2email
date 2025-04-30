@@ -26,6 +26,7 @@ export default defineConfig(({ mode }) => {
             'element-plus': ['element-plus'],
             jsstore: ['jsstore'],
             lodash: ['lodash-es'],
+            'xlsx': ['xlsx'],
           },
         },
       },

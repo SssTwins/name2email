@@ -3,7 +3,8 @@ import { ref, onMounted } from 'vue'
 import conn, { tableData } from '../db/conn.js'
 import { isNonEmptyString } from '../common/utils.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Plus, Promotion } from '@element-plus/icons-vue'
+import { writeFile, utils } from 'xlsx'
 
 const panelTableData = ref([])
 const total = ref(0)
@@ -54,6 +55,7 @@ const handleSizeChange = (size) => {
   pageSize.value = size
   fetchData()
 }
+
 const handleCurrentChange = (currPage) => {
   currentPage.value = currPage
   fetchData()
@@ -152,6 +154,49 @@ const showCreateRow = () => {
   panelTableData.value = [newRow, ...panelTableData.value]
   startEdit(newRow)
 }
+
+const exporting = ref(false)
+
+const exportData = async () => {
+  exporting.value = true
+  // 防止导出出现问题导致页面逻辑错误
+  setTimeout(() => {
+    if (exporting.value !== false) {
+      exporting.value = false
+    }
+  }, 1000)
+  const where = { id: { '>': 0 } }
+  if (isNonEmptyString(filterForm.value.name)) {
+    Object.assign(where, {
+      name: {
+        like: '%' + filterForm.value.name + '%',
+      },
+    })
+  }
+  if (isNonEmptyString(filterForm.value.email)) {
+    Object.assign(where, {
+      email: {
+        like: '%' + filterForm.value.email + '%',
+      },
+    })
+  }
+
+  let value = await conn.then((conn) => {
+    return conn.select({
+      from: tableData,
+      limit: 10000,
+      where: where,
+    })
+  })
+  value.forEach((row) => {
+    delete row.id
+  })
+  const worksheet = utils.json_to_sheet(value, { header: ['name', 'email'] })
+  const workbook = utils.book_new()
+  utils.book_append_sheet(workbook, worksheet, 'name2email')
+  writeFile(workbook, 'name2email.xlsx', { compression: true })
+  exporting.value = false
+}
 </script>
 
 <template>
@@ -181,11 +226,29 @@ const showCreateRow = () => {
     </el-form>
     <el-row style="padding-bottom: 15px">
       <el-button type="primary" @click="showCreateRow" class="mb-3" size="small">
-        <el-icon>
+        <el-icon class="btn-icon">
           <Plus />
         </el-icon>
         新增
       </el-button>
+      <el-tooltip
+        effect="dark"
+        content="根据当前页面筛选条件导出，限一万条数据"
+        placement="bottom-start"
+      >
+        <el-button
+          type="primary"
+          @click="exportData"
+          class="mb-3"
+          size="small"
+          :disabled="exporting"
+        >
+          <el-icon class="btn-icon">
+            <Promotion />
+          </el-icon>
+          导出
+        </el-button>
+      </el-tooltip>
     </el-row>
     <el-table :data="panelTableData" v-loading="loading" border stripe style="width: 100%">
       <el-table-column prop="id" label="ID" width="50"></el-table-column>
@@ -240,5 +303,9 @@ const showCreateRow = () => {
 <style scoped>
 .form-inline {
   padding-top: 10px;
+}
+
+.btn-icon {
+  padding-right: 7px;
 }
 </style>
