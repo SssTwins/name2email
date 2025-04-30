@@ -1,4 +1,11 @@
-let isProgrammaticChange = false // 全局标记
+const suggestionsPopupId = 'suggestions-popup'
+
+// 全局标记
+let isProgrammaticChange = false
+
+// 淡出定时器
+let popupTimeout = null
+let popupInterval = null
 
 document.addEventListener('input', async function (event) {
   if (isProgrammaticChange) return // 跳过程序触发的修改
@@ -27,8 +34,11 @@ document.addEventListener('input', async function (event) {
 
 // 在全局添加键盘事件监听
 document.addEventListener('keydown', function (event) {
-  const popup = document.getElementById('suggestions-popup')
+  const popup = document.getElementById(suggestionsPopupId)
   if (!popup) return
+
+  // 重置淡出计时
+  resetPopupTimer()
 
   const items = popup.querySelectorAll('.suggestion-item')
   if (items.length === 0) return
@@ -86,6 +96,7 @@ function smartInputValue(inputElement, suggestion) {
     setTimeout(() => {
       isProgrammaticChange = false
     }, 100)
+    clearTimeout(popupTimeout)
   }
 }
 
@@ -134,14 +145,6 @@ function adjustPopupPosition(popup, inputElement) {
   popup.style.left = `${left}px`
 }
 
-// 隐藏候选项
-function hideSuggestions() {
-  const popup = document.getElementById('suggestions-popup')
-  if (popup) {
-    popup.remove()
-  }
-}
-
 // 显示候选项
 function showSuggestions(inputElement, suggestions) {
   // 移除已有的弹出框
@@ -149,7 +152,7 @@ function showSuggestions(inputElement, suggestions) {
 
   // 创建弹出框
   const popup = document.createElement('div')
-  popup.id = 'suggestions-popup'
+  popup.id = suggestionsPopupId
   Object.assign(popup.style, {
     position: 'absolute',
     border: '1px solid #e0e0e0',
@@ -163,6 +166,7 @@ function showSuggestions(inputElement, suggestions) {
     paddingTop: '32px', // 增加顶部内边距
     width: '300px', // 固定宽度
     fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, sans-serif', // 系统字体
+    opacity: 1, //透明度
   })
 
   // 添加滚动容器
@@ -245,7 +249,7 @@ function showSuggestions(inputElement, suggestions) {
       }
       // 添加悬停效果
       item.addEventListener('mouseover', () => {
-        const popup = document.getElementById('suggestions-popup')
+        const popup = document.getElementById(suggestionsPopupId)
         // 如果是按键触发的滚动期间，忽略悬停事件
         if (popup && popup.getAttribute('data-scrolling') === 'true') {
           return
@@ -284,5 +288,49 @@ function showSuggestions(inputElement, suggestions) {
   // 将弹出框添加到页面中
   document.body.appendChild(popup)
 
+  // 淡化效果逻辑
+  startPopupTimer()
+
+  // 为弹出框添加鼠标活动监听
+  popup.addEventListener('mousemove', resetPopupTimer)
+  popup.addEventListener('click', resetPopupTimer)
+
   adjustPopupPosition(popup, inputElement)
+}
+
+// 隐藏候选项
+function hideSuggestions() {
+  const popup = document.getElementById(suggestionsPopupId)
+  if (popup) {
+    popup.remove()
+  }
+  clearTimeout(popupTimeout)
+  clearInterval(popupInterval)
+}
+
+// 新增定时器控制函数
+function startPopupTimer() {
+  clearTimeout(popupTimeout)
+  popupTimeout = setTimeout(() => {
+    hideSuggestions()
+  }, 5000) // 5秒无操作后触发
+
+  clearInterval(popupInterval)
+  popupInterval = setInterval(() => {
+    const popup = document.getElementById(suggestionsPopupId)
+    if (popup) {
+      let opacity = parseInt(popup.style.opacity)
+      if (opacity > 0) {
+        let nextOpacity = opacity - 0.1
+        popup.style.opacity = nextOpacity + ''
+      }
+    }
+    console.log('定时执行')
+  }, 500)
+}
+
+function resetPopupTimer() {
+  const popup = document.getElementById(suggestionsPopupId)
+  if (!popup) return
+  startPopupTimer(popup)
 }
