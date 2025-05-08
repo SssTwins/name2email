@@ -4,6 +4,7 @@ import { read, utils } from 'xlsx'
 import { isNonEmptyString } from '../common/utils.js'
 import conn, { tableData } from '../db/conn.js'
 import { ElMessage, genFileId } from 'element-plus'
+import { Download } from '@element-plus/icons-vue'
 
 const uploadRef = ref()
 const fileData = ref()
@@ -67,6 +68,15 @@ const handleExceed = (files) => {
 const handleRemove = () => {
   fileData.value = null // 清除文件数据
 }
+
+const downloadTemplate = () => {
+  const link = document.createElement('a')
+  link.href = '/templates/name2email.xlsx'
+  link.download = 'name2email.xlsx'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
 </script>
 
 <template>
@@ -76,7 +86,18 @@ const handleRemove = () => {
         <!-- 数据导入板块 -->
         <el-col :xs="24" :sm="24" :md="8" class="card-col">
           <el-card class="import-card" shadow="hover">
-            <h3 class="card-title">批量导入</h3>
+            <template #header>
+              <div class="card-header">
+                <!-- 新增header容器 -->
+                <span class="card-title">批量导入</span>
+                <el-button type="info" class="download-btn" @click="downloadTemplate">
+                  <el-icon class="btn-icon">
+                    <Download />
+                  </el-icon>
+                  下载模板
+                </el-button>
+              </div>
+            </template>
             <div class="upload-container">
               <el-upload
                 ref="uploadRef"
@@ -104,7 +125,7 @@ const handleRemove = () => {
                   开始导入
                 </el-button>
               </el-upload>
-              <div class="upload-tips">支持.xlsx格式，最大50MB</div>
+              <div class="upload-tips">支持.xlsx格式</div>
             </div>
           </el-card>
         </el-col>
@@ -138,12 +159,27 @@ const handleRemove = () => {
   transform: translateY(-5px);
 }
 
+/* 新增header部分样式 */
+.card-header {
+  display: flex;
+  justify-content: space-between; /* 左右两端对齐 */
+  align-items: center; /* 垂直居中 */
+  width: 100%;
+}
+
 .card-title {
-  margin: 0 0 20px 0;
+  margin: 0; /* 移除原来的margin */
   color: #409eff;
   font-size: 18px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 12px;
+  /* 移除原来的padding-bottom */
+}
+
+.download-btn {
+  margin-left: auto; /* 将按钮推到右侧 */
+}
+
+.btn-icon {
+  padding-right: 7px;
 }
 
 .upload-container {

@@ -11,7 +11,9 @@ document.addEventListener('input', async function (event) {
   if (isProgrammaticChange) return // 跳过程序触发的修改
   const target = event.target
   // 检查目标元素是否是输入框
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+  let tagName = target.tagName
+  let type = target.type
+  if ((tagName === 'INPUT' || tagName === 'TEXTAREA') && type === 'text') {
     const name = target.value.trim()
     // 如果输入的是姓名，则生成候选项
     if (name) {
