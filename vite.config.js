@@ -15,22 +15,6 @@ export default defineConfig(({ mode }) => {
   const production = mode === 'production'
 
   return {
-    build: {
-      emptyOutDir: true,
-      outDir: 'build',
-      rollupOptions: {
-        output: {
-          chunkFileNames: 'assets/chunk-[hash].js',
-          manualChunks: {
-            'vue-vendor': ['vue', 'vue-router'],
-            'element-plus': ['element-plus'],
-            jsstore: ['jsstore'],
-            lodash: ['lodash-es'],
-            'xlsx': ['xlsx'],
-          },
-        },
-      },
-    },
     plugins: [
       crx({ manifest }),
       vue(),
@@ -54,6 +38,33 @@ export default defineConfig(({ mode }) => {
         ],
       }),
     ],
+    build: {
+      emptyOutDir: true,
+      outDir: 'build',
+      rollupOptions: {
+        output: {
+          chunkFileNames: 'assets/chunk-[name]-[hash].js',
+          manualChunks: (id) => {
+            if (id.includes('vue') || id.includes('vue-router')) {
+              return 'vue-vendor'
+            }
+            if (id.includes('element-plus')) {
+              return 'element-plus'
+            }
+            if (id.includes('jsstore')) {
+              return 'jsstore'
+            }
+            if (id.includes('lodash-es')) {
+              return 'lodash'
+            }
+            if (id.includes('xlsx')) {
+              return 'xlsx'
+            }
+            return null
+          },
+        },
+      },
+    },
     legacy: {
       skipWebSocketTokenCheck: true,
     },
