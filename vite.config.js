@@ -45,12 +45,15 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           chunkFileNames: 'assets/chunk-[name]-[hash].js',
-          manualChunks: {
-            'vue-vendor': ['vue', 'vue-router'],
-            'element-plus': ['element-plus'],
-            jsstore: ['jsstore'],
-            lodash: ['lodash-es'],
-            xlsx: ['xlsx'],
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('vue')) return 'vue'
+              if (id.includes('vue-router')) return 'vue-router'
+              if (id.includes('element-plus')) return 'element-plus'
+              if (id.includes('jsstore')) return 'jsstore'
+              if (id.includes('lodash-es')) return 'lodash'
+              if (id.includes('xlsx')) return 'xlsx'
+            }
           },
         },
       },
