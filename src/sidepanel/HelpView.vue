@@ -11,83 +11,78 @@ const qrCodes = {
 </script>
 
 <template>
-  <el-container>
-    <el-main class="container">
-      <el-row :gutter="20" class="main-row">
-        <!-- 支持 -->
-        <el-col :xs="24" :sm="24" :md="8" class="card-col">
+  <el-container class="container">
+    <!-- 支持 -->
+    <section>
+      <el-card class="help-card" shadow="hover">
+        <template #header>
+          <div class="card-header">
+            <span class="card-title">支持</span>
+            <el-icon class="card-title-icon">
+              <User />
+            </el-icon>
+          </div>
+        </template>
+        <div class="contact-content">
+          <div class="contact-item">
+            <el-icon>
+              <Message />
+            </el-icon>
+            联系作者
+            <el-link type="primary" href="mailto:s1716082907@gmail.com">
+              s1716082907@gmail.com
+            </el-link>
+          </div>
+          <div class="contact-item">
+            <el-icon>
+              <House />
+            </el-icon>
+            代码仓库
+            <el-link
+              type="success"
+              href="https://github.com/SssTwins/name2email"
+              target="_blank"
+            >
+              https://github.com/SssTwins/name2email
+            </el-link>
+          </div>
+        </div>
+      </el-card>
+    </section>
+    <!-- 打赏（添加折叠功能） -->
+    <!-- 打赏卡片 -->
+    <section>
+      <el-collapse v-model="activeCollapse" class="custom-collapse">
+        <el-collapse-item name="donate">
+          <template #title>
+            <div class="collapse-header">
+              <el-icon>
+                <Wallet />
+              </el-icon>
+              <span class="card-title">打赏</span>
+            </div>
+          </template>
           <el-card class="help-card" shadow="hover">
-            <template #header>
-              <div class="card-header">
-                <span class="card-title">支持</span>
-                <el-icon class="card-title-icon">
-                  <User />
-                </el-icon>
+            <div class="donate-content">
+              <!-- 切换按钮 -->
+              <div class="qr-switch">
+                <el-radio-group v-model="qrType" size="small">
+                  <el-radio-button label="alipay">支付宝</el-radio-button>
+                  <el-radio-button label="wechat">微信</el-radio-button>
+                </el-radio-group>
               </div>
-            </template>
-            <div class="contact-content">
-              <div class="contact-item">
-                <el-icon>
-                  <Message />
-                </el-icon>
-                联系作者
-                <el-link type="primary" href="mailto:s1716082907@gmail.com">
-                  s1716082907@gmail.com
-                </el-link>
-              </div>
-              <div class="contact-item">
-                <el-icon>
-                  <House />
-                </el-icon>
-                代码仓库
-                <el-link
-                  type="success"
-                  href="https://github.com/SssTwins/name2email"
-                  target="_blank"
-                >
-                  https://github.com/SssTwins/name2email
-                </el-link>
-              </div>
+
+              <!-- 二维码图片 -->
+              <el-image :src="qrCodes[qrType]" class="qrcode" fit="cover">
+                <template #error>
+                  <div class="error-tip">二维码加载失败</div>
+                </template>
+              </el-image>
             </div>
           </el-card>
-        </el-col>
-
-        <!-- 打赏（添加折叠功能） -->
-        <!-- 打赏卡片 -->
-        <el-col :xs="24" :sm="24" :md="8" class="card-col">
-          <el-collapse v-model="activeCollapse" class="custom-collapse">
-            <el-collapse-item name="donate">
-              <template #title>
-                <div class="collapse-header">
-                  <el-icon>
-                    <Wallet />
-                  </el-icon>
-                  <span class="card-title">打赏</span>
-                </div>
-              </template>
-              <el-card class="help-card" shadow="hover">
-                <div class="donate-content">
-                  <!-- 切换按钮 -->
-                  <div class="qr-switch">
-                    <el-radio-group v-model="qrType" size="small">
-                      <el-radio-button label="alipay">支付宝</el-radio-button>
-                      <el-radio-button label="wechat">微信</el-radio-button>
-                    </el-radio-group>
-                  </div>
-
-                  <!-- 二维码图片 -->
-                  <el-image :src="qrCodes[qrType]" class="qrcode" fit="cover">
-                    <template #error>
-                      <div class="error-tip">二维码加载失败</div>
-                    </template>
-                  </el-image>
-                </div>
-              </el-card>
-            </el-collapse-item>
-          </el-collapse>
-        </el-col>
-      </el-row>
-    </el-main>
+        </el-collapse-item>
+      </el-collapse>
+    </section>
   </el-container>
 </template>
 
@@ -176,9 +171,13 @@ const qrCodes = {
 
 /* 保持原有容器样式不变 */
 .container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .main-row {
