@@ -12,6 +12,7 @@ router.push({ path: '/table' })
     <el-menu mode="horizontal" :default-active="defaultActive" :router="true" class="menu">
       <el-menu-item index="/table">数据表格</el-menu-item>
       <el-menu-item index="/upload">文件上传</el-menu-item>
+      <el-menu-item index="/help">帮助</el-menu-item>
     </el-menu>
 
     <div class="content">

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import TableView from '../sidepanel/TableView.vue'
 import UploadView from '../sidepanel/UploadView.vue'
+import HelpView from '../sidepanel/HelpView.vue'
 
 const sidePanelRoutes = [
   {
@@ -12,6 +13,11 @@ const sidePanelRoutes = [
     path: '/upload',
     name: 'upload',
     component: UploadView,
+  },
+  {
+    path: '/help',
+    name: 'help',
+    component: HelpView,
   },
   {
     path: '/',
