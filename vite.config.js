@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => {
     build: {
       emptyOutDir: true,
       outDir: 'build',
-      minify: false,
+      minify: true,
       rollupOptions: {
         output: {
           chunkFileNames: 'assets/chunk-[name]-[hash].js',
@@ -49,7 +49,6 @@ export default defineConfig(({ mode }) => {
             if (id.includes('node_modules')) {
               if (id.includes('vue')) return 'vue'
               if (id.includes('vue-router')) return 'vue-router'
-              if (id.includes('element-plus')) return 'element-plus'
               if (id.includes('jsstore')) return 'jsstore'
               if (id.includes('lodash-es')) return 'lodash'
               if (id.includes('xlsx')) return 'xlsx'
