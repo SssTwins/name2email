@@ -27,3 +27,4 @@ secrets.*.js
 /name2email/
 /name2email.zip
 stats.html
+package-lock.json

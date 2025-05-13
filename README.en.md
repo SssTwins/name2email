@@ -6,7 +6,7 @@
 
 ## Installing
 
-1. Check if your `Node.js` version is >= **14.18.0**
+1. Check if your `Node.js` version is >= **18.27.0**
 2. Run `npm install` to install the dependencies
 
 ## Developing
