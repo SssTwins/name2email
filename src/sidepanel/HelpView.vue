@@ -38,11 +38,7 @@ const qrCodes = {
               <House />
             </el-icon>
             代码仓库
-            <el-link
-              type="success"
-              href="https://github.com/SssTwins/name2email"
-              target="_blank"
-            >
+            <el-link type="success" href="https://github.com/SssTwins/name2email" target="_blank">
               https://github.com/SssTwins/name2email
             </el-link>
           </div>
@@ -63,6 +59,7 @@ const qrCodes = {
             </div>
           </template>
           <el-card class="help-card" shadow="hover">
+            <p style="text-align: center">感谢支持</p>
             <div class="donate-content">
               <!-- 切换按钮 -->
               <div class="qr-switch">
@@ -171,13 +168,13 @@ const qrCodes = {
 
 /* 保持原有容器样式不变 */
 .container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .main-row {

@@ -1,7 +1,7 @@
 {
   "name": "name2email",
   "displayName": "name2email",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "author": "SssTwins",
   "description": "",
   "type": "module",
@@ -13,7 +13,7 @@
     "create-chrome-ext"
   ],
   "engines": {
-    "node": ">=18.27.0"
+    "node": ">=18.20.0"
   },
   "scripts": {
     "dev": "vite",
