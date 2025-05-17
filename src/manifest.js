@@ -25,7 +25,7 @@ export default defineManifest({
   },
   content_scripts: [
     {
-      matches: ['http://*/*', 'https://*/*'],
+      matches: ['https://eventlink.wizards.com/*'],
       js: ['src/contentScript/index.js'],
     },
   ],
@@ -38,11 +38,5 @@ export default defineManifest({
       matches: [],
     },
   ],
-  permissions: ['sidePanel', 'storage', 'webRequest'],
-
-  content_security_policy: {
-    extension_pages: "script-src 'self'; object-src 'self';",
-    sandbox:
-      "sandbox allow-scripts allow-forms allow-popups allow-modals; script-src 'self' 'unsafe-inline' 'unsafe-eval'; child-src 'self';",
-  },
+  permissions: ['sidePanel', 'storage'],
 })
